@@ -1,4 +1,4 @@
-package main
+package handler
 
 import (
 	"bytes"
@@ -41,13 +41,13 @@ func TestRandomNumbersHandler_TableDriven(t *testing.T) {
 			name:           "ส่งค่าถูกต้อง (เลข 5 ต้องผ่านฉลุย)",
 			inputBody:      `{"count": 5}`,
 			expectedStatus: http.StatusOK, // 200
-			expectedBody:   `"data"`,      // ต้องมีคีย์ data โผล่มาให้หน้าบ้าน
+			expectedBody:   `"data"`,
 		},
 		{
 			name:           "ส่งข้อมูลพังๆ ไม่ใช่ JSON (ต้องโดนดักตั้งแต่ประตูแรก)",
 			inputBody:      `{"count": "ไม่ใช่ตัวเลข"}`,
 			expectedStatus: http.StatusBadRequest, // 400
-			expectedBody:   "กรุณากรอกข้อมูลให้ถูกต้อง",
+			expectedBody:   "ข้อมูลที่ส่งมาไม่ถูกต้อง",
 		},
 	}
 
@@ -67,6 +67,39 @@ func TestRandomNumbersHandler_TableDriven(t *testing.T) {
 
 			if !strings.Contains(w.Body.String(), tc.expectedBody) {
 				t.Errorf("เคส [%s] พัง: คาดหวังว่าจะเจอคำว่า '%s' แต่ในเนื้อหาจริงกลับไม่มี", tc.name, tc.expectedBody)
+			}
+		})
+	}
+}
+
+func TestGenerateLuckyNumber(t *testing.T) {
+	tests := []struct {
+		name     string
+		prefix   string
+		expected int
+	}{
+		{
+			name:     "prefix 3 digits",
+			prefix:   "123",
+			expected: 10,
+		},
+		{
+			name:     "prefix 1 digit",
+			prefix:   "9",
+			expected: 10,
+		},
+		{
+			name:     "empty prefix",
+			prefix:   "",
+			expected: 7, // ถ้าไม่มี prefix ควรเหลือแค่ 7 หลักตาม rand.Intn
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := generateLuckyNumber(tt.prefix)
+			if len(got) != tt.expected {
+				t.Errorf("generateLuckyNumber() = %v (len: %d), want length %d", got, len(got), tt.expected)
 			}
 		})
 	}

@@ -1,7 +1,8 @@
 package main
 
 import (
-	"backendluckynumber/function"
+	"backendluckynumber/handler"
+	"backendluckynumber/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -9,10 +10,10 @@ import (
 func SetupRouter() *gin.Engine {
 	r := gin.Default()
 
-	r.Use(function.CORSMiddleware())
+	r.Use(middleware.CORSMiddleware())
 
-	r.GET("/api/random-number", function.GetRandomNumberHandler)
-	r.POST("/api/random-numbers", function.RandomNumbersHandler)
+	r.GET("/api/random-number", handler.GetRandomoneNumberHandler)
+	r.POST("/api/random-numbers", handler.RandomNumbersHandler)
 
 	return r
 }
